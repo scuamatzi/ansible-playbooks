@@ -1,0 +1,32 @@
+---
+- name: check updates availables on servers
+  hosts: all !vpnsrv !deploysrv
+  become: true
+  tasks:
+    - block:
+      - name: update cache on Ubuntu
+        ansible.builtin.apt:
+          update_cache: true
+          cache_valid_time: 3600
+
+      - name: get list of updates available
+        shell: apt-show-versions -u
+        register: output
+      
+      - name: PRINT UBUNTU SERVERS 
+        debug:
+          var: output.stdout_lines
+      when: ansible_os_family=="Debian"
+    - block:
+      - name: update database
+        ansible.builtin.yum:
+          update_cache: true
+      - name: get list of updates on CentOS
+        shell: yum list updates
+        register: output2
+        args:
+          warn: false
+      - name: PRINT CENTOS SERVERS
+        debug:
+          var: output2.stdout_lines
+      when: ansible_os_family=="RedHat"

@@ -1,0 +1,12 @@
+---
+# tasks file for copy_aliases
+- name: copy aliases to Server as user
+  become: False
+  ansible.builtin.template:
+    src: aliases.j2
+    dest: ~/.bash_aliases
+- name: copy aliases to Server as root
+  become: True
+  ansible.builtin.template:
+    src: aliases.j2
+    dest: ~/.bash_aliases

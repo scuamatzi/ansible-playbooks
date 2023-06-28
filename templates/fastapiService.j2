@@ -1,0 +1,13 @@
+[Unit]
+Description=FastApi test
+After=network-online.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/fastapi
+Environment="PATH=/home/ubuntu/fastapi/env/bin"
+ExecStart=/home/ubuntu/fastapi/env/bin/gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app
+
+[Install]
+WantedBy=multi-user.target

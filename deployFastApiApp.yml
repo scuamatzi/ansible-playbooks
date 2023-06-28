@@ -1,0 +1,101 @@
+---
+- name: prepare deploy server
+  become: true
+  hosts: deploysrv
+  tasks:
+    - name: upgrade New Server
+      block:
+        - name: update cache and install aptitude
+          ansible.builtin.apt:
+            name: aptitude
+            state: latest
+            update_cache: true
+            cache_valid_time: 3600
+        - name: upgrade OS
+          ansible.builtin.apt:
+            upgrade: safe
+            update_cache: true
+            cache_valid_time: 3600
+          notify: rebootsrv
+        - name: Ejecute handlers if needed before proceed
+          meta: flush_handlers
+    - name: Install tools and configure enviroment
+      block:
+        - name: install python3
+          ansible.builtin.apt:
+            name: python3
+            state: latest
+            update_cache: true
+            cache_valid_time: 3600
+        - name: copy aliases to .bash_aliases file on root
+          ansible.builtin.template:
+            src: templates/aliases.j2
+            dest: ~/.bash_aliases
+        - name: copy aliases to .bash_aliases file on user
+          become: False
+          ansible.builtin.template:
+            src: templates/aliases.j2
+            dest: ~/.bash_aliases
+        - name: install venv, python3-pip, zip and unzip, python3 and nginx
+          ansible.builtin.apt:
+            pkg:
+              - python3.10-venv
+              - unzip
+              - zip
+              - python3-pip
+              - nginx
+            state: latest
+            update_cache: true
+            cache_valid_time: 3600
+        - name: unzip fastapi project
+          become: false
+          ansible.builtin.unarchive:
+            src: files/fastapi.zip
+            dest: ~/
+        - name: create enviroment
+          ansible.builtin.shell:
+            chdir: ~/fastapi
+            cmd: python3 -m venv env
+          become: false
+        - name: pip install fastapi, uvicorn, gunicorn
+          ansible.builtin.pip:
+            virtualenv: ~/fastapi/env
+            name:
+              - fastapi
+              - uvicorn
+              - gunicorn
+              - python-jose[cryptography]
+              - passlib[bcrypt]
+              - pymongo
+          become: false
+    - name: Configure service and nginx
+      block:
+        - name: create service for fastapi
+          ansible.builtin.template:
+            src: templates/fastapiService.j2
+            dest: /etc/systemd/system/fastapi.service
+        - name: start fastapi service
+          ansible.builtin.systemd:
+            state: started
+            name: fastapi
+            enabled: True
+        - name: copy nginx template
+          ansible.builtin.template:
+            src: templates/fastapiNginxTemplate.j2
+            dest: /etc/nginx/sites-available/fastapi
+        - name: change public ip on nginx config file
+          ansible.builtin.script:
+            cmd: scripts/nginxFastApiSrv.sh
+        - name: create symlink on nginx
+          ansible.builtin.file:
+            src: /etc/nginx/sites-available/fastapi
+            dest: /etc/nginx/sites-enabled/fastapi
+            state: link
+        - name: restart nginx service
+          ansible.builtin.systemd:
+            name: nginx
+            state: restarted
+  handlers:
+    - name: rebootsrv
+      ansible.builtin.reboot:
+        reboot_timeout: 4200

@@ -1,0 +1,5 @@
+---
+# handlers file for update_server
+- name: rebootsrv
+  ansible.builtin.reboot:
+    reboot_timeout: 4200

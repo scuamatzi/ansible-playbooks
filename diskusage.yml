@@ -1,0 +1,10 @@
+---
+#- hosts: mainsrvcdmx
+- hosts: all
+- name: Get disk usage
+  tasks:
+    - name: check free Space
+      shell: df -h
+      #shell: df -h | grep data
+      register: storage
+    - debug: var=storage.stdout_lines

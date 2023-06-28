@@ -1,0 +1,10 @@
+---
+- name: restart servers
+  hosts: all !vpnsrv
+  gather_facts: no
+
+  tasks:
+  - name: Reboot server
+    become: true
+    ansible.builtin.reboot:
+      reboot_timeout: 4200

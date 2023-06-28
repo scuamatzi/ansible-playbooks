@@ -1,0 +1,18 @@
+---
+- name: Config new server
+  hosts: deploy
+  become: True
+  tasks:
+    - name: install aptitude
+      ansible.builtin.apt:
+        name: aptitude
+        state: latest
+        update_cache: true #forces update of repository before installation
+        cache_valid_time: 3600
+    - name: install apt-show-versions
+      ansible.builtin.apt:
+        name: apt-show-versions
+        state: latest
+  roles:
+    - update_server
+    - copy_aliases

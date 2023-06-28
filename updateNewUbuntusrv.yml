@@ -1,0 +1,45 @@
+---
+- name: Update cache of packages
+  hosts: all !vpnsrv
+  become: true
+  tasks:
+#    - name:  apply update command
+#      ansible.builtin.apt:
+#        update_cache: yes
+#      register: storage
+    - name: install aptitude
+      ansible.builtin.apt:
+        name: aptitude
+        state: latest
+        update_cache: true #forces update of repository before installation
+        cache_valid_time: 3600
+    - name: install apt-show-versions
+      ansible.builtin.apt:
+        name: apt-show-versions
+        state: latest
+    - name: safe-upgrade of server OS
+      ansible.builtin.apt:
+        upgrade: safe  #could be no/safe/full/dist -> safe-upgrade/full-upgrade/dist-upgrade
+        update_cache: true
+        cache_valid_time: 3600
+      notify: rebootsrv
+    - name: Execute handler if needed
+      meta: flush_handlers
+    - name: copy aliases
+      ansible.builtin.template:
+        src: templates/aliases.j2
+        dest: ~/.bash_aliases
+    - name: install python3
+      ansible.builtin.apt:
+        name: python3
+        state: latest
+        update_cache: true
+        cache_valid_time: 3600
+#    - name: Print updates available #it only shows that the command worked
+#      debug: #it only shows that the command worked
+#        msg: "{{ storage }}" #it only shows that the command worked
+
+  handlers:
+    - name: rebootsrv
+      ansible.builtin.reboot:
+        reboot_timeout: 4200

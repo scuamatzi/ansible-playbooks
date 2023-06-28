@@ -1,0 +1,13 @@
+---
+- name: Create bash aliases on server
+  hosts: deploy
+  tasks:
+  - name:  using template
+    ansible.builtin.template:
+      src: templates/aliases.j2
+      dest: ~/.bash_aliases
+  - name:  using template
+    become: True
+    ansible.builtin.template:
+      src: templates/aliases.j2
+      dest: ~/.bash_aliases

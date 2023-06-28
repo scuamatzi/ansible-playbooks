@@ -1,0 +1,7 @@
+---
+- name:  Safe upgrade servers
+  hosts: all !vpnsrv
+  #hosts: nodejssrv
+  become: True
+  roles:
+    - update_server

@@ -1,0 +1,8 @@
+---
+- name: Get all facts
+  hosts: ansibletest1
+  tasks:
+    - name: PRINT FACTS
+      ansible.builtin.debug:
+        #var: ansible_facts
+        msg: "{{ inventory_hostname }}"

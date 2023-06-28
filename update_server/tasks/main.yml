@@ -1,0 +1,19 @@
+---
+# tasks file for update_server
+- name: Update Ubuntu Server
+  ansible.builtin.apt:
+    upgrade: safe
+    update_cache: True
+    cache_valid_time: 3600
+  notify: rebootsrv
+  when: ansible_os_family=="Debian"
+
+- name: Update CentOS Server
+  ansible.builtin.yum:
+    name: '*'
+    state: latest
+  notify: rebootsrv
+  when: ansible_os_family=="RedHat"
+
+- name: Force reboot if upgraded
+  meta: flush_handlers

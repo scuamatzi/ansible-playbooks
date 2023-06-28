@@ -1,0 +1,13 @@
+---
+- name: Check connections to vpn servers
+  hosts: vpnsrv
+  become: true
+  tasks:
+    - name: get log file content
+      #ansible.builtin.shell: cat /var/log/openvpn/openvpn-status.log
+      ansible.builtin.shell:
+        cmd: cat /var/log/openvpn/openvpn-status.log
+      register: output
+    - name: PRINT RESULT
+      debug:
+        var: output.stdout_lines

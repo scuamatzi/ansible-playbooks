@@ -1,0 +1,26 @@
+---
+- name: Backup ETC folder from servers
+  hosts: all
+  gather_facts: no
+#  become: true
+  tasks:
+    - name: get current date 
+      shell: "date +%Y-%m-%d"
+      register: timevar
+    - name: set name of file
+      set_fact:
+        filename: "etc.{{ inventory_hostname }}.{{ timevar.stdout }}"
+#    - name: create file on remote
+#      shell: "touch {{ filename }}"
+    - name: compress etc folder
+      shell: "zip -rq {{ filename }}.zip /etc"
+      become: true
+    - name: download file
+      ansible.builtin.fetch:
+        src: ~/{{ filename }}.zip
+        dest: /home/diablo/Documents/office/backups/
+        flat: yes
+#    - name:  PRINT OUTPUT
+#      ansible.builtin.debug:
+#        msg: "This is the filename: {{ filename }}"
+      
