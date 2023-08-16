@@ -1,6 +1,6 @@
 ---
 - name: Config new server
-  hosts: deploy
+  hosts: all !vpnsrv
   become: True
   tasks:
     - name: install aptitude

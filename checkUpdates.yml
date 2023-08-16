@@ -1,6 +1,6 @@
 ---
 - name: check updates availables on servers
-  hosts: all !vpnsrv !deploysrv
+  hosts: all !vpnsrv 
   become: true
   tasks:
     - block:
