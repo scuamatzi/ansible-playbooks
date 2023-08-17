@@ -1,17 +1,27 @@
 ---
 - name: Backup ETC folder from servers
   hosts: all
-  gather_facts: no
-#  become: true
   tasks:
+    - name: install zip command on debian based OS
+      become: True
+      ansible.builtin.apt:
+        name: zip
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_os_family=="Debian"
+    - name: install zip command on RedHat based OS
+      become: True
+      ansible.builtin.yum:
+        name: zip
+        state: present
+      when: ansible_os_family=="RedHat"
     - name: get current date 
       shell: "date +%Y-%m-%d"
       register: timevar
     - name: set name of file
       set_fact:
         filename: "etc.{{ inventory_hostname }}.{{ timevar.stdout }}"
-#    - name: create file on remote
-#      shell: "touch {{ filename }}"
     - name: compress etc folder
       shell: "zip -rq {{ filename }}.zip /etc"
       become: true
