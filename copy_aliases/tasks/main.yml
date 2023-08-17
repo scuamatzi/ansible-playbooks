@@ -10,3 +10,13 @@
   ansible.builtin.template:
     src: aliases.j2
     dest: ~/.bash_aliases
+- name: copy vim .exrc to server as user
+  become: False
+  ansible.builtin.template:
+    src: vimexrc.j2
+    dest: ~/.exrc
+- name: copy vim .exrc to server as root
+  become: True
+  ansible.builtin.template:
+    src: vimexrc.j2
+    dest: ~/.exrc

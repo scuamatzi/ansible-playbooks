@@ -3,24 +3,6 @@
   hosts: all !vpnsrv
   become: true
   tasks:
-    - name: update cache and install aptitude
-      ansible.builtin.apt:
-        name: aptitude
-        state: latest
-        update_cache: true
-        cache_valid_time: 3600
-    - name: install apt-show-versions
-      ansible.builtin.apt:
-        name: apt-show-versions
-        state: latest
-    - name: safe upgrade of ubuntu
-      ansible.builtin.apt:
-        upgrade: safe
-        update_cache: true
-        cache_valid_time: 3600
-    - name: reboot server
-      ansible.builtin.reboot:
-        reboot_timeout: 4200
     - name: install nginx
       ansible.builtin.apt:
         name: nginx
