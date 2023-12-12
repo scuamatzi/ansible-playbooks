@@ -16,3 +16,4 @@
   roles:
     - update_server
     - copy_aliases
+    - set_timezone

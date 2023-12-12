@@ -1,0 +1,6 @@
+---
+# tasks file for set_timezone
+- name: set timezone to Mexico City
+  become: true
+  timezone:
+    name: America/Mexico_City
